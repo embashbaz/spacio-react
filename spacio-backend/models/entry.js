@@ -15,7 +15,7 @@ const entrySchema = new mongoose.Schema({
   timeOut: Number,
   flagged: Boolean,
   noteIn: String,
-  notOut: String,
+  noteOut: String,
   vehicle:
       {
         type: mongoose.Schema.Types.ObjectId,
