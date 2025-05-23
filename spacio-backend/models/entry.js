@@ -1,0 +1,42 @@
+const mongoose = require('mongoose')
+
+mongoose.set('strictQuery', false)
+
+const entrySchema = new mongoose.Schema({
+  carBrandInfo: {
+    type: String,
+    minLength: 1,
+    required: true
+  },
+  timeIn: {
+    type: Number,
+    required: true
+  },
+  timeOut: Number,
+  flagged: Boolean,
+  noteIn: String,
+  notOut: String,
+  vehicle:
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Vehicle'
+      },
+  person:
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Person'
+      },
+}, {
+  timestamps: true
+})
+
+entrySchema.set('toJSON', {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString()
+    delete returnedObject._id
+    delete returnedObject.__v
+  }
+})
+
+
+module.exports = mongoose.model('Entry', entrySchema)
