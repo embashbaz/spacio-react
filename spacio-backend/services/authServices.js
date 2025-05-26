@@ -33,7 +33,10 @@ const getTokenFrom = request => {
 }
 
 let getUserFromRequestToken = async (request) => {
-  const decodedToken = jwt.verify(getTokenFrom(request), config.TOKEN_SECRET)
+  const token = getTokenFrom(request)
+  if(!token)
+    return null
+  const decodedToken = jwt.verify(token, config.TOKEN_SECRET)
   if (!decodedToken.id) {
     return null
   }

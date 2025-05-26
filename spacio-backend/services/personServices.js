@@ -1,15 +1,18 @@
 const Person = require('../models/person')
+const logger = require('../utils/logger')
 
 let addPerson = async (firstName, lastName, email, phoneNumber) => {
 
   const existingUserByEmail = await Person.findOne({ email: email })
   const existingByPhone = await Person.findOne({ phoneNumber: phoneNumber })
 
-  if(existingByPhone){
+  logger.info(`by email ${existingUserByEmail} by phone ${phoneNumber}`)
+
+  if(existingByPhone && phoneNumber){
     return existingByPhone
   }
 
-  if(existingUserByEmail){
+  if(existingUserByEmail && email){
     return existingUserByEmail
   }
 

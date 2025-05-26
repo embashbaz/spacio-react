@@ -9,9 +9,9 @@ personRouter.post('/', async (request, response) => {
 
   const { firstName, lastName, email, phoneNumber } = request.body
 
-  const user = authServices.getUserFromRequestToken(request)
+  const user = await authServices.getUserFromRequestToken(request)
   if(!user){
-    return response.status(401).json({ error: 'token invalid' })
+    throw 'JsonWebTokenError'
   }
 
   const savedUser = await personServices.addPerson(
@@ -41,9 +41,9 @@ personRouter.get('/', async (request, response) => {
 
 personRouter.get('/:id', async (req, res, next) => {
   try {
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
     const person = await Person.findById(req.params.id).populate('org')
     if (!person) {
@@ -58,9 +58,9 @@ personRouter.get('/:id', async (req, res, next) => {
 personRouter.put('/:id', async (req, res, next) => {
   try {
     const updatedData = req.body
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
     const updatedPerson = await Person.findByIdAndUpdate(
       req.params.id,
@@ -85,9 +85,9 @@ personRouter.put('/:id', async (req, res, next) => {
 personRouter.delete('/:id', async (req, res, next) => {
   try{
 
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
 
     const deleted = await Person.findByIdAndDelete(req.params.id)
@@ -101,6 +101,9 @@ personRouter.delete('/:id', async (req, res, next) => {
     next(error)
   }
 })
+
+
+module.exports = personRouter
 
 
 

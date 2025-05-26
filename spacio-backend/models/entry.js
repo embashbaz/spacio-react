@@ -3,11 +3,7 @@ const mongoose = require('mongoose')
 mongoose.set('strictQuery', false)
 
 const entrySchema = new mongoose.Schema({
-  carBrandInfo: {
-    type: String,
-    minLength: 1,
-    required: true
-  },
+
   timeIn: {
     type: Number,
     required: true

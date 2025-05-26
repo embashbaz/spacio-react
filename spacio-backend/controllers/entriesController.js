@@ -7,12 +7,14 @@ const Entry = require('../models/entry')
 const Person = require('../models/person')
 const Vehicle = require('../models/vehicle')
 
+const logger = require('../utils/logger')
 
 entriesRouter.post('/', async (req, res, next) => {
   try {
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
+      // return res.status(401).json({ error: 'token invalid' })
     }
 
     const { timeIn,
@@ -32,6 +34,7 @@ entriesRouter.post('/', async (req, res, next) => {
 
     let vehicleId = null
 
+
     if(vehicleBrand || vehiclePlate){
       const vehicle = await new Vehicle({ carBrandInfo: vehicleBrand, plate: vehiclePlate })
       vehicleId = vehicle._id
@@ -47,7 +50,7 @@ entriesRouter.post('/', async (req, res, next) => {
       noteIn: noteIn,
       noteOut: noteOut,
       flagged: flagged,
-      user: person._id,
+      person: person._id,
       vehicle: vehicleId
     })
 
@@ -65,9 +68,9 @@ entriesRouter.post('/', async (req, res, next) => {
 
 entriesRouter.get('/', async (req, res, next) => {
   try {
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
 
     const term = req.query.term?.trim()
@@ -117,9 +120,9 @@ entriesRouter.get('/', async (req, res, next) => {
 
 entriesRouter.get('/:id', async (req, res, next) => {
   try {
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
     const entry = await Entry.findById(req.params.id)
       .populate('vehicle')
@@ -139,11 +142,10 @@ entriesRouter.get('/:id', async (req, res, next) => {
 entriesRouter.put('/:id', async (req, res, next) => {
   try {
     const updatedData = req.body
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
-
 
     const updatedEntry = await Entry.findByIdAndUpdate(
       req.params.id,
@@ -170,9 +172,9 @@ entriesRouter.put('/:id', async (req, res, next) => {
 
 entriesRouter.delete('/:id', async (req, res, next) => {
   try {
-    const user = authServices.getUserFromRequestToken(req)
+    const user = await authServices.getUserFromRequestToken(req)
     if(!user){
-      return res.status(401).json({ error: 'token invalid' })
+      throw 'JsonWebTokenError'
     }
 
     const deletedEntry = await Entry.findByIdAndDelete(req.params.id)
@@ -186,3 +188,5 @@ entriesRouter.delete('/:id', async (req, res, next) => {
     next(error)
   }
 })
+
+module.exports = entriesRouter

@@ -17,7 +17,7 @@ authRouter.post('/login', async (request, response) => {
     : await bcrypt.compare(password, user.passwordHash)
 
 
-  if(!user.id || !passwordCorrect){
+  if(!user || !passwordCorrect){
     return response.status(401).json({
       error: 'invalid username or password'
     })
@@ -50,7 +50,8 @@ authRouter.post('/register', async (request, response ) => {
   const user = new SystemUser({
     firstName: firstName,
     lastName: lastName,
-    passwordHash: encrypPassword
+    passwordHash: encrypPassword,
+    email: email
 
   })
 
@@ -67,5 +68,7 @@ authRouter.post('/register', async (request, response ) => {
     .send(resp)
 })
 
+
+module.exports = authRouter
 
 
