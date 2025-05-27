@@ -3,10 +3,7 @@ import * as React from 'react';
 
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Checkbox from '@mui/material/Checkbox';
-import CssBaseline from '@mui/material/CssBaseline';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Divider from '@mui/material/Divider';
+
 import FormLabel from '@mui/material/FormLabel';
 import FormControl from '@mui/material/FormControl';
 import Link from '@mui/material/Link';
@@ -15,9 +12,12 @@ import Typography from '@mui/material/Typography';
 import Stack from '@mui/material/Stack';
 import MuiCard from '@mui/material/Card';
 import { styled } from '@mui/material/styles';
-import theme from '../theme/theme';
-import { ThemeProvider } from '@mui/material/styles';
 
+
+import authService from '../services/authService'
+import {
+    useNavigate
+  } from 'react-router-dom'
 
 
 
@@ -64,12 +64,17 @@ const Card = styled(MuiCard)(({ theme }) => ({
   }));
 
 
-  const Login = () => {
+  const Login = ({}) => {
     const [emailError, setEmailError] = React.useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = React.useState('');
   const [open, setOpen] = React.useState(false);
+
+  const [email, setEmail] = React.useState('');
+  const [password, setPassword] = React.useState('');
+
+  const navigate = useNavigate()
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -80,24 +85,41 @@ const Card = styled(MuiCard)(({ theme }) => ({
   };
 
   const handleSubmit = (event) => {
+    event.preventDefault();
     if (emailError || passwordError) {
-      event.preventDefault();
       return;
     }
-    const data = new FormData(event.currentTarget);
     console.log({
-      email: data.get('email'),
-      password: data.get('password'),
+        email: email,
+        password: password,
     });
+    authService.login(
+        {
+      email: email,
+      password: password,
+        }
+    ).then(res => {
+        window.localStorage.setItem(
+            'token', res.token
+          )   
+          navigate('/')
+    }).catch(err => {
+        if( err.response.data.error ){
+            console.log(err.response.data)
+            alert(`${err.response.data.error}`)
+        } else {
+          alert(`Could not login`)
+        }
+    })
   };
 
   const validateInputs = () => {
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
+    // const email = document.getElementById('email');
+    // const password = document.getElementById('password');
 
     let isValid = true;
 
-    if (!email.value || !/\S+@\S+\.\S+/.test(email.value)) {
+    if (!email || !/\S+@\S+\.\S+/.test(email)) {
       setEmailError(true);
       setEmailErrorMessage('Please enter a valid email address.');
       isValid = false;
@@ -106,9 +128,9 @@ const Card = styled(MuiCard)(({ theme }) => ({
       setEmailErrorMessage('');
     }
 
-    if (!password.value || password.value.length < 6) {
+    if (!password || password.length < 3) {
       setPasswordError(true);
-      setPasswordErrorMessage('Password must be at least 6 characters long.');
+      setPasswordErrorMessage('Password must be at least 3 characters long.');
       isValid = false;
     } else {
       setPasswordError(false);
@@ -120,8 +142,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
 
   return (
     
-    <ThemeProvider theme={theme}>
-      <CssBaseline enableColorScheme />
+    
       <SignInContainer direction="column" justifyContent="space-between">
         
         <Card variant="outlined">
@@ -154,6 +175,8 @@ const Card = styled(MuiCard)(({ theme }) => ({
                 name="email"
                 placeholder="your@email.com"
                 autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 autoFocus
                 required
                 fullWidth
@@ -166,6 +189,8 @@ const Card = styled(MuiCard)(({ theme }) => ({
               <TextField
                 error={passwordError}
                 helperText={passwordErrorMessage}
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 name="password"
                 placeholder="••••••"
                 type="password"
@@ -193,7 +218,7 @@ const Card = styled(MuiCard)(({ theme }) => ({
          
         </Card>
       </SignInContainer>
-    </ThemeProvider>
+    
   );
   }
 

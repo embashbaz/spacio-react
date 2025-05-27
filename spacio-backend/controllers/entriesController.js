@@ -17,7 +17,8 @@ entriesRouter.post('/', async (req, res, next) => {
       // return res.status(401).json({ error: 'token invalid' })
     }
 
-    const { timeIn,
+    const { 
+      timeIn,
       timeOut,
       flagged,
       noteIn,
@@ -60,6 +61,7 @@ entriesRouter.post('/', async (req, res, next) => {
 
 
   } catch (error) {
+    console.log(`error ${error}`)
     next(error)
   }
 
